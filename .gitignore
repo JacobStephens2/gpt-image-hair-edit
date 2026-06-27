@@ -1,0 +1,21 @@
+.DS_Store
+.env
+.venv/
+__pycache__/
+*.pyc
+
+# Keep this repo code-only by default.
+*.jpg
+*.jpeg
+*.png
+*.webp
+*.gif
+*.heic
+inputs/
+outputs/
+*_response.json
+
+# Local secrets.
+openai-key.txt
+*api*key*.txt
+*secret*.txt
