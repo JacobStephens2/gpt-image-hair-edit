@@ -4,6 +4,10 @@ Small Python CLI for using OpenAI's image edit API to change only a subject's ha
 
 The default prompt is tuned for realistic hair-color edits. It asks the model to keep the face, skin tone, expression, eyes, hands, jewelry, clothing, background, lighting, framing, and photo texture intact.
 
+## Project Context
+
+This started as a command-line workaround. I wanted to try the leading image-edit model shown on [Arena's image edit leaderboard](https://arena.ai/leaderboard/image-edit), but I did not find a straightforward way to run that exact workflow from OpenAI's browser apps. So I used the OpenAI API from the command line and worked through the edit with Codex CLI using GPT-5.5.
+
 ## What It Does
 
 - Uses `gpt-image-2` through OpenAI's image edit API.
