@@ -11,19 +11,24 @@ from openai import OpenAI
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Edit a photo with gpt-image-2 to change hair color only."
+        description="Edit a photo with gpt-image-2."
     )
     parser.add_argument("image", type=Path, help="Input image path.")
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("edited_hair_color.png"),
+        default=Path("edited.png"),
         help="Output PNG path.",
+    )
+    parser.add_argument(
+        "--prompt",
+        default="",
+        help="Custom edit prompt. Overrides the default hair-color prompt.",
     )
     parser.add_argument(
         "--color",
         default="strawberry blonde",
-        help='Target hair color, for example "strawberry blonde".',
+        help='Target hair color (used only when --prompt is not set).',
     )
     parser.add_argument(
         "--model",
@@ -61,14 +66,17 @@ def read_api_key(api_key_file: Path | None) -> str | None:
     return os.environ.get("OPENAI_API_KEY")
 
 
-def build_prompt(color: str, extra_instruction: str) -> str:
-    prompt = (
-        "Edit this photo realistically. Change only the subject's hair color "
-        f"to natural {color} with believable highlights, roots, shadows, and "
-        "strand detail. Do not change eyebrows. Preserve the face, eyes, skin "
-        "tone, expression, hands, jewelry, clothing, background, lighting, "
-        "framing, and photo-realistic texture."
-    )
+def build_prompt(custom_prompt: str, color: str, extra_instruction: str) -> str:
+    if custom_prompt:
+        prompt = custom_prompt
+    else:
+        prompt = (
+            "Edit this photo realistically. Change only the subject's hair color "
+            f"to natural {color} with believable highlights, roots, shadows, and "
+            "strand detail. Do not change eyebrows. Preserve the face, eyes, skin "
+            "tone, expression, hands, jewelry, clothing, background, lighting, "
+            "framing, and photo-realistic texture."
+        )
     if extra_instruction:
         prompt = f"{prompt} {extra_instruction.strip()}"
     return prompt
@@ -89,7 +97,12 @@ def main() -> None:
         )
 
     client = OpenAI(api_key=api_key)
-    prompt = build_prompt(args.color, args.extra_instruction)
+
+    custom_prompt = args.prompt
+    if not custom_prompt:
+        custom_prompt = input("Edit prompt (Enter to use default hair-color edit): ").strip()
+
+    prompt = build_prompt(custom_prompt, args.color, args.extra_instruction)
 
     with image_path.open("rb") as image_file:
         result = client.images.edit(
